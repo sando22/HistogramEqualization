@@ -27,6 +27,8 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
     private static final int SELECT_PICTURE = 1;
     private ImageView image;
     private int opened = 0;
+    private Bitmap equalizedPicture = null;
+    private Bitmap grayscaledPicture = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +55,43 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
 
         switch (id) {
             case R.id.menu_saveImage:
-                if (opened == 1) {
-                    image.buildDrawingCache();
-                    Bitmap bm = image.getDrawingCache();
-                    addImageToGallery(bm);
-                    opened = 0;
-                }else {
-                    Toast.makeText(this, "Nothing to save", Toast.LENGTH_SHORT).show();
+                switch (opened){
+                    case 1:
+                        addImageToGallery(grayscaledPicture);
+                        opened = 0;
+                        break;
+                    case 2:
+                        addImageToGallery(equalizedPicture);
+                        opened = 0;
+                        break;
+                    default:
+                        Toast.makeText(this, "Nothing to save", Toast.LENGTH_SHORT).show();
+                        break;
                 }
                 return true;
             case R.id.menu_equalize:
-                //todo aaa
+                if (opened == 3) {
+                    image.buildDrawingCache();
+                    Bitmap bmToEqualize = image.getDrawingCache();
+                    equalizedPicture = HistogramEqualizator.histogram_equalization(bmToEqualize);
+                    image.setImageBitmap(equalizedPicture);
+                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                    opened = 2;
+                } else {
+                    Toast.makeText(this, "Nothing to work on", Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            case R.id.menu_grayscale:
+                if (opened == 3) {
+                    image.buildDrawingCache();
+                    Bitmap bmToGreyscale = image.getDrawingCache();
+                    grayscaledPicture = GreyScaleConverter.toGrayscale(bmToGreyscale);
+                    image.setImageBitmap(grayscaledPicture);
+                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
+                    opened = 1;
+                } else {
+                    Toast.makeText(this, "Nothing to work on", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -93,7 +121,7 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                opened = 1;
+                opened = 3;
             }
         }
     }
@@ -109,16 +137,16 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
 
     public void addImageToGallery(final Bitmap bm) {
         String extr = Environment.getExternalStorageDirectory().toString();
-        File mFolder = new File(extr + "/MyApp");
+        File mFolder = new File(extr + "/Histogram equalizer");
         if (!mFolder.exists()) {
             mFolder.mkdir();
         }
         String strF = mFolder.getAbsolutePath();
-        File mSubFolder = new File(strF + "/MyApp-SubFolder");
+        File mSubFolder = new File(strF + "/TEMP");
         if (!mSubFolder.exists()) {
             mSubFolder.mkdir();
         }
-        String s = "myfile.png";
+        String s = "temp.png";
         File f = new File(mSubFolder.getAbsolutePath(), s);
         FileOutputStream fos = null;
         try {
@@ -126,14 +154,13 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
             bm.compress(Bitmap.CompressFormat.PNG, 70, fos);
             fos.flush();
             fos.close();
-            //MediaStore.Images.Media.insertImage(getContentResolver(), bm, "Screen", "screen");
-            MediaStore.Images.Media.insertImage(getContentResolver(), bm, "HistogramPic", "BULLSHLAKA");
-            Toast.makeText(this, "Good game bro", Toast.LENGTH_SHORT).show();
+            MediaStore.Images.Media.insertImage(getContentResolver(), bm, "CustomizedPic", "BULLSHLAKA");
+            Toast.makeText(this, "Picture saved", Toast.LENGTH_SHORT).show();
         } catch (FileNotFoundException e) {
             Toast.makeText(this, "File not found", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         } catch (Exception e) {
-            Toast.makeText(this, "Just shit", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }

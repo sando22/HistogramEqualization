@@ -6,6 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="menu_saveImage_string">Save Image</string>
     <string name="menu_equalizeString">Equalize Histogram</string>
+    <string name="menu_grayscaleString">Greyscale Image</string>
     <string name="dialog_exit_title">Exit the app</string>
     <string name="yes">Yes</string>
     <string name="cancel">No</string>
