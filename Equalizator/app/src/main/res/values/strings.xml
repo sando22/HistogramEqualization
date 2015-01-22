@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Equalizator</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_saveImage_string">Save Image</string>
+    <string name="menu_equalizeString">Equalize Histogram</string>
+    <string name="dialog_exit_title">Exit the app</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">No</string>
+    <string name="save_image_button">Save it</string>
+    <string name="open_image_button">Open image</string>
+
+</resources>
