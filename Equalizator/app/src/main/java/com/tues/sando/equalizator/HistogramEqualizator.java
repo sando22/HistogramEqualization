@@ -107,7 +107,7 @@ public class HistogramEqualizator {
                 image.setPixel(w, h, pix);
                 pix = 0;
             }
-        }
+        }//todo MOJE BI DA GO NAPRAVQ DA RABOTI DEEBA KURA
         return image;
-    }//histogram equalization
+    }
 }
