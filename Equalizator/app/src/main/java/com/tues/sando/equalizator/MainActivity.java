@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -29,12 +30,15 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
     private int opened = 0;
     private Bitmap equalizedPicture = null;
     private Bitmap grayscaledPicture = null;
+    private Bitmap normalPicture = null;
+    public Button undoButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         image = (ImageView) findViewById(R.id.mainImage);
+        undoButton = (Button) findViewById(R.id.undo_button);
     }
 
     @Override
@@ -52,17 +56,18 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         switch (id) {
             case R.id.menu_saveImage:
                 switch (opened){
                     case 1:
                         addImageToGallery(grayscaledPicture);
                         opened = 0;
+                        undoButton.setVisibility(View.INVISIBLE);
                         break;
                     case 2:
                         addImageToGallery(equalizedPicture);
                         opened = 0;
+                        undoButton.setVisibility(View.INVISIBLE);
                         break;
                     default:
                         Toast.makeText(this, "Nothing to save", Toast.LENGTH_SHORT).show();
@@ -74,9 +79,11 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
                     image.buildDrawingCache();
                     Bitmap bmToEqualize = image.getDrawingCache();
                     equalizedPicture = HistogramEqualizator.histogram_equalization(bmToEqualize);
+                    image.destroyDrawingCache();
                     image.setImageBitmap(equalizedPicture);
                     Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
                     opened = 2;
+                    undoButton.setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(this, "Nothing to work on", Toast.LENGTH_SHORT).show();
                 }
@@ -86,9 +93,11 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
                     image.buildDrawingCache();
                     Bitmap bmToGreyscale = image.getDrawingCache();
                     grayscaledPicture = GreyScaleConverter.toGrayscale(bmToGreyscale);
+                    image.destroyDrawingCache();
                     image.setImageBitmap(grayscaledPicture);
                     Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
                     opened = 1;
+                    undoButton.setVisibility(View.VISIBLE);
                 } else {
                     Toast.makeText(this, "Nothing to work on", Toast.LENGTH_SHORT).show();
                 }
@@ -117,7 +126,8 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
             if (requestCode == SELECT_PICTURE) {
                 Uri selectedImageUri = data.getData();
                 try {
-                    image.setImageBitmap(getBitmapFromUri(selectedImageUri));
+                    normalPicture = getBitmapFromUri(selectedImageUri);
+                    image.setImageBitmap(normalPicture);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -165,4 +175,11 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
         }
     }
 
+    public void undoAction(View view) {
+        if (opened == 1 || opened == 2){
+            image.setImageBitmap(normalPicture);
+            opened = 3;
+            undoButton.setVisibility(View.INVISIBLE);
+        }
+    }
 }

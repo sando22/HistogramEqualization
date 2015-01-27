@@ -2,12 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/begin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity"
-    android:background="@drawable/begin">
+    tools:context=".MainActivity">
 
     <ImageView
         android:id="@+id/mainImage"
@@ -15,15 +15,31 @@
         android:layout_height="360dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
 
-    <Button
-        android:id="@+id/open_image"
-        android:layout_width="150dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:onClick="openGallery"
-        android:text="@string/open_image_button" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/undo_button"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:onClick="undoAction"
+            android:text="@string/undo_button"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/open_image"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:onClick="openGallery"
+            android:text="@string/open_image_button" />
+
+    </LinearLayout>
 
 </RelativeLayout>

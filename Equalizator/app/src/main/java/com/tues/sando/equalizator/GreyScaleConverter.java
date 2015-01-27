@@ -7,11 +7,11 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 
 public class GreyScaleConverter {
-    public static Bitmap toGrayscale(Bitmap bmpOriginal)
+    public static Bitmap toGrayscale(Bitmap originalBitmap)
     {
         int width, height;
-        height = bmpOriginal.getHeight();
-        width = bmpOriginal.getWidth();
+        height = originalBitmap.getHeight();
+        width = originalBitmap.getWidth();
 
         Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmpGrayscale);
@@ -20,7 +20,7 @@ public class GreyScaleConverter {
         cm.setSaturation(0);
         ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
         paint.setColorFilter(f);
-        c.drawBitmap(bmpOriginal, 0, 0, paint);
+        c.drawBitmap(originalBitmap, 0, 0, paint);
         return bmpGrayscale;
     }
 }

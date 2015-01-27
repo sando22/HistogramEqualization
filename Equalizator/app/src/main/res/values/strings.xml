@@ -12,5 +12,6 @@
     <string name="cancel">No</string>
     <string name="save_image_button">Save it</string>
     <string name="open_image_button">Open image</string>
+    <string name="undo_button">Undo</string>
 
 </resources>
