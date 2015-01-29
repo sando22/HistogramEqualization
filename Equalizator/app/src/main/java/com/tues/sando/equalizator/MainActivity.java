@@ -105,13 +105,24 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
                 return true;
             case R.id.menu_grayscale:
                 if (opened == 3) {
-                    image.buildDrawingCache();
-                    Bitmap bmToGreyscale = image.getDrawingCache();
-                    grayscaledPicture = GreyScaleConverter.toGrayscale(bmToGreyscale);
-                    image.destroyDrawingCache();
-                    image.setImageBitmap(grayscaledPicture);
-                    opened = 1;
-                    undoButton.setVisibility(View.VISIBLE);
+                    dialog = ProgressDialog.show(this, "Grayscaling", "Please wait");
+                    Thread th = new Thread(){
+                      public void run(){
+                          image.buildDrawingCache();
+                          Bitmap bmToGreyscale = image.getDrawingCache();
+                          grayscaledPicture = GreyScaleConverter.toGrayscale(bmToGreyscale);
+                          image.destroyDrawingCache();
+                          opened = 1;
+                          handler.post(new Runnable() {
+                              public void run() {
+                                  dialog.dismiss();
+                                  image.setImageBitmap(grayscaledPicture);
+                                  undoButton.setVisibility(View.VISIBLE);
+                              }
+                          });
+                      }
+                    };
+                    th.start();
                 } else {
                     Toast.makeText(this, "Nothing to work on", Toast.LENGTH_SHORT).show();
                 }
