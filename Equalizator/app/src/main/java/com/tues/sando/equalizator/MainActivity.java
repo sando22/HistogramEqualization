@@ -1,11 +1,13 @@
 package com.tues.sando.equalizator;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -31,6 +33,8 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
     private Bitmap equalizedPicture = null;
     private Bitmap grayscaledPicture = null;
     private Bitmap normalPicture = null;
+    private Handler handler;
+    private ProgressDialog dialog;
     public Button undoButton;
 
     @Override
@@ -39,6 +43,7 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
         setContentView(R.layout.activity_main);
         image = (ImageView) findViewById(R.id.mainImage);
         undoButton = (Button) findViewById(R.id.undo_button);
+        handler = new Handler();
     }
 
     @Override
@@ -76,14 +81,24 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
                 return true;
             case R.id.menu_equalize:
                 if (opened == 3) {
-                    image.buildDrawingCache();
-                    Bitmap bmToEqualize = image.getDrawingCache();
-                    equalizedPicture = HistogramEqualizator.histogram_equalization(bmToEqualize);
-                    image.destroyDrawingCache();
-                    image.setImageBitmap(equalizedPicture);
-                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
-                    opened = 2;
-                    undoButton.setVisibility(View.VISIBLE);
+                    dialog = ProgressDialog.show(this, "Equalizing", "Please wait");
+                    Thread th = new Thread(){
+                        public void run(){
+                            image.buildDrawingCache();
+                            Bitmap bmToEqualize = image.getDrawingCache();
+                            equalizedPicture = HistogramEqualizator.histogram_equalization(bmToEqualize);
+                            image.destroyDrawingCache();
+                            opened = 2;
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    dialog.dismiss();
+                                    image.setImageBitmap(equalizedPicture);
+                                    undoButton.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                    };
+                    th.start();
                 } else {
                     Toast.makeText(this, "Nothing to work on", Toast.LENGTH_SHORT).show();
                 }
@@ -95,7 +110,6 @@ public class MainActivity extends ActionBarActivity implements ExitDialog.Comuni
                     grayscaledPicture = GreyScaleConverter.toGrayscale(bmToGreyscale);
                     image.destroyDrawingCache();
                     image.setImageBitmap(grayscaledPicture);
-                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show();
                     opened = 1;
                     undoButton.setVisibility(View.VISIBLE);
                 } else {
